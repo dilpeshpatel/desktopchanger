@@ -3,15 +3,15 @@
 import subprocess
 from pathlib import Path
 import logging
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument("image", help="Full image file location to be set to the \
+                                    desktop background.")
+args =parser.parse_args()
+arg_wallpaper = args.image
 
 logging.basicConfig(filename=('desktopchanger.log'),level=logging.DEBUG)
-
-# global variables to use
-wallpaper_folder = ''
-a = ''
-b = ''
-c = ''
 
 class WallpaperChanger:
     """ The DesktopChanger class can be used to read and set the wallpaper 
@@ -25,20 +25,12 @@ class WallpaperChanger:
         xfconf-query.
         """
         try:
-            new_wallpaper = Path(Path.home(), wallpaper_folder)
-            if not new_wallpaper.is_dir():
-                raise NotADirectoryError
-            self.wallpaper = new_wallpaper / wallpaper_file
-            """ The following few lines of code doesn't seem to work for this
-            version of python. (maybe fixed in a later version of 3.5.4-5)
-            """
-            # if not new_wallpaper.is_file():
-            #     raise FileNotFoundError
-        except NotADirectoryError as e_info:
-            print("Wallpaper folder must be a directory")
-            raise
+            self.wallpaper = Path(wallpaper_file)
+            if not self.wallpaper.is_file():
+                raise FileNotFoundError
         except FileNotFoundError as e_info:
-            print("The wallpaper file doesn't exist the wallpaper folder")
+            print("The wallpaper file doesn't exist the wallpaper folder \n"
+                + e_info)
             raise
 
     def current_wallpaper(self):
@@ -57,11 +49,14 @@ class WallpaperChanger:
             cmd = WallpaperChanger.cmd_wallpaper_set + str(self.wallpaper)
             cmd_output = subprocess.run(cmd, shell='/bin/bash')
             logging.debug(cmd_output)
-            print(cmd_output)
+            print(cmd_output) #TODO: remove when everything is working properly
 
 # Main Script body
 logging.debug("Executing wallpaper.py")
-wallpaper_changer = WallpaperChanger(c)
+if not arg_wallpaper is None:
+    wallpaper_changer = WallpaperChanger(arg_wallpaper)
+else:
+    pass
 old_wallpaper = wallpaper_changer.current_wallpaper()
-print(old_wallpaper)
+logging.debug(str("old wallpaper path: ", old_wallpaper)) 
 wallpaper_changer.apply_new_wallpaper()
