@@ -2,6 +2,9 @@
 
 from pathlib import Path
 import subprocess
+import logging
+
+logging.basicConfig(filename=('desktopchanger.log'),level=logging.DEBUG)
 
 # global variables to use
 wallpaper_folder = ''
@@ -52,9 +55,11 @@ class WallpaperChanger:
         if old_wallpaper != self.wallpaper:
             cmd = WallpaperChanger.cmd_wallpaper_set + str(self.wallpaper)
             cmd_output = subprocess.run(cmd, shell='/bin/bash')
+            logging.debug(cmd_output)
             print(cmd_output)
 
-
+# Main Script body
+logging.debug("Executing wallpaper.py")
 wallpaper_changer = WallpaperChanger(c)
 old_wallpaper = wallpaper_changer.current_wallpaper()
 print(old_wallpaper)
