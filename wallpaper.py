@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-from pathlib import Path
 import subprocess
+from pathlib import Path
 import logging
+
 
 logging.basicConfig(filename=('desktopchanger.log'),level=logging.DEBUG)
 
