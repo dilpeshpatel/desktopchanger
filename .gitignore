@@ -1,1 +1,7 @@
+__pycache__/
+.cache
 *.log
+.pytest_cache
+
+\.vscode/
+data/wallpapers.csv

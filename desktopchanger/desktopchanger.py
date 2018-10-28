@@ -31,6 +31,7 @@ class WallpaperChanger:
                 + e_info)
             raise
 
+    @staticmethod
     def current_wallpaper():
         """ read current wallpaper being applied from xfconf-query.
         Returns a Path object.  

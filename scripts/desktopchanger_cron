@@ -1,0 +1,4 @@
+SHELL=/bin/bash
+PATH=~/bin:/usr/bin/:/bin
+* * * * * <user> /bin/bash -c ". ~/.bashrc; ~/<path_to_project_folder>/desktopchanger.bash  > ~/<path_to_project_folder>/logs/desktopchanger_bash.log 2>&1"
+
