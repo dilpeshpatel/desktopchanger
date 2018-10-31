@@ -10,7 +10,8 @@ Ultimate aim of this project is to be able to adjust the wallpaper (and in futur
 
 The following command can be run to update the desktop background:
 
-``
+`python3 updatedesktop.py`
+`python3 wallpaperscanner.py`
 
 ## Phase 2
 
