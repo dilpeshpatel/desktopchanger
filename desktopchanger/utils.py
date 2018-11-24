@@ -25,24 +25,6 @@ class imageStruct:
 
 ##### Functions
 #####
-def parse_yaml():
-    """ Reads in the contents of the yaml file and returns the results.
-    """
-    folderpath = os.getcwd() 
-    filename = 'config.yaml'
-    try: 
-        file = os.path.join(str(folderpath),filename) 
-        with open(file, 'r') as f: 
-            yaml_config = yaml.load(f) 
-    except IOError as e_info: 
-        print(e_info) 
-        raise 
-    except yaml.YAMLError as e_info: 
-        print("Failed to import file") 
-        raise 
-    return yaml_config
-
-
 ##### Classes
 #####
 class CSVFileIO:
@@ -74,3 +56,36 @@ class CSVFileIO:
             writer.writeheader()
             writer.writerows(data)
             logging.debug("rows written: " + str(len(data)))
+
+class yamlFileIO:
+    """Allows the reading and writing of yaml files including opening a
+    parsed object.
+    """
+    def __init__(self, folder, yamlfile):
+        self.data = {}
+        self.path = Path(folder, yamlfile)
+        
+    def readYaml(self):
+        """Reads from yaml file only if the yaml file exists. Otherwise
+        it returns without doing anything.
+        """
+        if not self.path.is_file():
+            return
+        try: 
+            with self.path.open('r') as f:
+                self.data = yaml.load(f) 
+        except IOError as e_info: 
+            print(e_info) 
+            raise
+        except yaml.YAMLError as e_info: 
+            print("Failed to import file") 
+            raise 
+
+    def writeYaml(self, output):
+        try:
+            with self.path.open('w') as f:
+                yaml.dump(output,f, default_flow_style=False)
+        except IOError as e_info:
+            print(e_info)
+            raise
+        

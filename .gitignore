@@ -3,6 +3,7 @@ __pycache__/
 .cache
 *.log
 .pytest_cache
-
+env/
 \.vscode/
 data/wallpapers.csv
+data/dates.yaml

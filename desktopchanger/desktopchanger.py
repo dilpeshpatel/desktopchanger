@@ -12,12 +12,14 @@ import subprocess
 import os
 from pathlib import Path
 import logging
+import pytz
 import random
-import yaml
-from desktopchanger.utils import parse_yaml, CSVFileIO
+import datetime
+import iso8601
+from desktopchanger.utils import CSVFileIO, yamlFileIO
+from desktopchanger.sunequation import SunEquation
 
 sys_random = random.SystemRandom()
-
 
 ##### Functions
 #####
@@ -41,14 +43,44 @@ class DesktopChanger:
             self.wallpaper_file = Path(str(args.image))
         else:
             self.wallpaper_file = None
+        yaml_config = yamlFileIO("", "config.yaml")
+        yaml_config.readYaml()
+        self.csvfile = yaml_config.data['csvFile']
+        self.latitude = yaml_config.data['latitude']
+        self.longitude = yaml_config.data['longitude']
 
-        yaml_config = parse_yaml()
-        self.csvfile = yaml_config['csvFile']
-
+    def update_sun(self):
+        """Retrieve sun information from file or update the information if the 
+        day (TODO: future location) information has changed.
+        """
+        dates_yaml = yamlFileIO("data", "dates.yaml")
+        dates_yaml.readYaml()
+        # Read file for date information
+        if len(dates_yaml.data) is not 0:
+            self.date = iso8601.parse_date(dates_yaml.data['date'])
+            if self.date == datetime.date.today():
+                # Parse from file if date hasn't changed
+                self.sunrise = iso8601.parse_date(dates_yaml.data['sunrise'])
+                self.sunset = iso8601.parse_date(dates_yaml.data['sunset'])
+                self.timezone = pytz.timezone(dates_yaml.data['timezone'])
+            #TODO: Can add location check here
+            else:
+                # Update date information
+                se = SunEquation(self.latitude,self.longitude)
+                se.calculate()
+                output = se.format_yaml()
+                self.date = output["date"]
+                self.sunrise = output["sunrise"]
+                self.sunset = output["sunset"]
+                self.timezone = output["timezone"]
+                dates_yaml.writeYaml(output)
+        
     def updater(self):
         """This function takes the information parsed from the 
         command-line and yaml file and determines what actions to take.
         """
+        self.update_sun()
+        # find image when not supplied by the commandline 
         if self.wallpaper_file is None:
             wallpapers = self.load_csv()
             self.select_wallpaper(wallpapers)
@@ -81,7 +113,6 @@ class DesktopChanger:
         """Set xfce theme.
         """
         pass
-
 
 class WallpaperChanger:
     """ The DesktopChanger class can be used to read and set the 
