@@ -2,7 +2,7 @@
     * imageStruct is just there for reference purposes and to allow the 
     fieldname variable to be set when saving to csv.
     * parse_yaml returns the contents of the config.yaml file as a dict
-    * CSVFileIO is used to interact with the csv file defined in 
+    * CSVFileIO is used to read from or write to a .csv file.
     config.yaml.
 """
 import logging
@@ -11,20 +11,6 @@ from pathlib import Path
 import csv
 import yaml
 
-##### Struct
-#####
-class imageStruct:
-
-    def __init__(self):
-        self.path = 'path'
-
-    @staticmethod
-    def fieldnames():
-        return str('path')
-
-
-##### Functions
-#####
 ##### Classes
 #####
 class CSVFileIO:
@@ -44,18 +30,18 @@ class CSVFileIO:
             reader = csv.DictReader(f, delimiter=',')
             for row in reader:
                 self.data.append(row) 
-        logging.debug("Rows: read: " + str(len(self.data)))
+        logging.debug("Rows: read: {}".format(len(self.data)))
         return self.data
 
-    def writeFile(self, data):
+    def writeFile(self, data, fieldnames):
         """ Writes wallpapers to a csv file.
         """
+        self.data = data
         with open(self.path, 'w') as csvfile:
-            fieldnames = [imageStruct.fieldnames()]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerows(data)
-            logging.debug("rows written: " + str(len(data)))
+            writer.writerows(self.data)
+            logging.debug("rows written: {}".format(len(self.data)))
 
 class yamlFileIO:
     """Allows the reading and writing of yaml files including opening a
@@ -82,10 +68,12 @@ class yamlFileIO:
             raise 
 
     def writeYaml(self, output):
+        """
+            Write dictionary object to yaml file.
+        """
         try:
             with self.path.open('w') as f:
-                yaml.dump(output,f, default_flow_style=False)
+                yaml.dump(output, f, default_flow_style=False)
         except IOError as e_info:
             print(e_info)
             raise
-        

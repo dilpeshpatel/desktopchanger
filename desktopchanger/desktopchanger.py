@@ -9,12 +9,11 @@ TODO: Fill out info of the methods to call to perform specific tasks.
 """
 
 import subprocess
-import os
 from pathlib import Path
 import logging
-import pytz
 import random
 import datetime
+import pytz
 import iso8601
 from desktopchanger.utils import CSVFileIO, yamlFileIO
 from desktopchanger.sunequation import SunEquation
@@ -76,8 +75,9 @@ class DesktopChanger:
                 dates_yaml.writeYaml(output)
         
     def updater(self):
-        """This function takes the information parsed from the 
-        command-line and yaml file and determines what actions to take.
+        """
+            This function takes the information parsed from the 
+            command-line and yaml file and determines what actions to take.
         """
         self.update_sun()
         # find image when not supplied by the commandline 
@@ -87,7 +87,8 @@ class DesktopChanger:
         self.set_wallpaper()
 
     def load_csv(self):
-        """Reads in the csv file and loads the data into memory.
+        """
+            Reads in the csv file and loads the data into memory.
         """
         read_file = CSVFileIO(self.csvfile)
         data = read_file.readFile()
@@ -95,7 +96,8 @@ class DesktopChanger:
         return data
 
     def select_wallpaper(self, data):
-        """ Selects the wallpaper to be set as deesktop background.
+        """ 
+            Selects the wallpaper to be set as deesktop background.
         """
         # Search criterion reduces length of class here
         chosen_image = randomiser(data)
@@ -103,14 +105,16 @@ class DesktopChanger:
         logging.debug("chosen image: "  + str(self.wallpaper_file))
 
     def set_wallpaper(self):
-        """Updates the wallpaper by creating a WallpaperChanger object 
-        and calling the apply_new_wallpaper method.
+        """
+            Updates the wallpaper by creating a WallpaperChanger object 
+            and calling the apply_new_wallpaper method.
         """
         wallpaper_changer = WallpaperChanger(self.wallpaper_file)
         wallpaper_changer.apply_new_wallpaper()
 
     def set_theme(self):
-        """Set xfce theme.
+        """
+            Set xfce theme.
         """
         pass
 
