@@ -22,10 +22,10 @@ sys_random = random.SystemRandom()
 
 ##### Functions
 #####
-def randomiser(wallpapers):
-    """ Return a random wallpaper from a list.
+def randomiser(count):
+    """ Returns a random number from 0 to count.
     """
-    return random.choice(wallpapers)
+    return random.randint(0,count-1)
 
 
 ##### Classes
@@ -33,7 +33,6 @@ def randomiser(wallpapers):
 class DesktopChanger:
     """High level control class.
     """
-
     def __init__(self, args):
         """ Takes in the command line options and reads the contents
         of the yaml configuration .
@@ -47,6 +46,19 @@ class DesktopChanger:
         self.csvfile = yaml_config.data['csvFile']
         self.latitude = yaml_config.data['latitude']
         self.longitude = yaml_config.data['longitude']
+        
+    def updater(self):
+        """
+            High level function used to:
+            * get or compute sunset and sunrise times
+            * set a randomised wallpaper depending on time of day
+        """
+        self.update_sun()
+        # find image when not supplied by the commandline 
+        if self.wallpaper_file is None:
+            wallpapers = self.load_csv()
+            self.select_wallpaper(wallpapers)
+        self.set_wallpaper()
 
     def update_sun(self):
         """Retrieve sun information from file or update the information if the 
@@ -92,13 +104,15 @@ class DesktopChanger:
         logging.debug("Number of lines read from csv file: " + str(len(data)))
         return data
 
-    def select_wallpaper(self, data):
+    def select_wallpaper(self, all_images):
         """ 
-            Selects the wallpaper to be set as deesktop background.
+            Selects the wallpaper to be set as desktop background.
         """
-        # Search criterion reduces length of class here
-        chosen_image = randomiser(data)
-        self.wallpaper_file = Path(str(chosen_image['path']))
+        # Search criterion reduces image list
+
+        filtered_paths = self.slice_wallpapers(all_images, self.is_night_time)
+        chosen_image = randomiser(len(filtered_paths))
+        self.wallpaper_file = Path(str(filtered_paths[chosen_image]))
         logging.debug("chosen image: "  + str(self.wallpaper_file))
 
     def set_wallpaper(self):
@@ -108,6 +122,27 @@ class DesktopChanger:
         """
         wallpaper_changer = WallpaperChanger(self.wallpaper_file)
         wallpaper_changer.apply_new_wallpaper()
+
+    def slice_wallpapers(self, images, is_night_time):
+        """
+            Remove images not fitting the day/night criteria.
+            Currently the subset is day_pic + night_pic = images
+        """ 
+        images = images.sort_values(['red', 'blue', 'light'])
+        try:
+            night_images = images.loc[(images.red < 0.15) & (images.blue < 0.1) & (images.light > 0.15)]
+            night_images_index = night_images.index.tolist()
+            assert night_images.empty is not True
+        except AssertionError as error:
+            print("No images left are processing criteria")
+            raise error
+        day_images_index = images.loc[~images.index.isin(night_images_index)].index.tolist()
+        if is_night_time:
+            logging.debug("Night images sliced: {}".format(len(night_images_index)))
+            return night_images_index
+        else:
+            logging.debug("Day images sliced: {}".format(len(day_images_index)))
+            return day_images_index
 
     def set_theme(self):
         """

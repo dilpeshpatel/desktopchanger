@@ -1,15 +1,17 @@
-""" The classes contained here are designed to traverse a given folder 
-and find images files.
-This will be turned into a database set at a later date.
-For now the behaviour is to analyse each image in a single directory 
-and extract the full path and some information about the image.
+""" 
+    The classes contained here are designed to traverse a given folder 
+    and find images files.
+    This will be turned into a database set at a later date.
+    For now the behaviour is to analyse each image in a single directory 
+    and extract the full path and some information about the image.
 
-Improvements
-*fieldnames variable should only exist in one place
+    Improvements
+    *fieldnames variable should only exist in one place
 """
 
 import logging
 from pathlib import Path
+import pandas
 from collections import deque
 from desktopchanger.utils import yamlFileIO, CSVFileIO
 from desktopchanger.imageanalysis import ImageAnalysis
@@ -25,7 +27,7 @@ class WallpaperSearch:
     """
     def __init__(self, args):
         try:
-            self.imagelist = []
+            self.image_data = []
             yaml_config = yamlFileIO("", "config.yaml")
             yaml_config.readYaml()
             # Setting base wallpaper folder
@@ -86,21 +88,25 @@ class WallpaperSearch:
         """Process the list of image paths, analyse each image and turn
         the list into a dict. TODO: analyse each image
         """
-        self.imagelist.clear()
+        imagelist = []
         for path in image_files:
             #Analyse each image for hues and brightness balance
             path_str = str(Path(Path.home(),path))
             image_analyse = ImageAnalysis(path_str)
             blue, green, red, light, dark = image_analyse.analyse_hsv()
             dictonary = self.dict_formatter(path_str, blue, green, red, light, dark)
-            self.imagelist.append(dictonary)
+            imagelist.append(dictonary)
+        # self.image_data = pandas.DataFrame(imagelist) 
+        data_frame = pandas.DataFrame(imagelist) 
+        self.image_data = data_frame.sort_values(['red', 'blue', 'light'])
+        
 
     def saveCSV(self):  
         """Save the list of images to disk.
         """
         # csvWriter = CSVFileIO(self.csv_file)
         fieldnames = ['path', 'blue', 'green', 'red', 'light', 'dark']
-        self.csv_io.writeFile(self.imagelist, fieldnames)
+        self.csv_io.writeFile(self.image_data, fieldnames)
         
     def dict_formatter(self, path, blue, green, red, light, dark):
         """
@@ -108,8 +114,8 @@ class WallpaperSearch:
             Note: This way seems terribly inefficient.
         """
         fieldnames = ['path', 'blue', 'green', 'red', 'light', 'dark']
-        data = [ path, round(blue, 5), round(green, 5), round(red, 5), 
-            round(light, 5), round(dark, 5) ]
+        data = [ path, round(blue, 3), round(green, 3), round(red, 3), 
+            round(light, 3), round(dark, 3) ]
         output = dict(zip(fieldnames, data))
         return output
 

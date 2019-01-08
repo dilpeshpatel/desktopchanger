@@ -9,6 +9,7 @@ import logging
 import os
 from pathlib import Path
 import csv
+import pandas
 import yaml
 
 ##### Classes
@@ -26,22 +27,14 @@ class CSVFileIO:
         """ Reads the entire csv file.
         """
         self.data.clear()
-        with open(self.path, 'r') as f:
-            reader = csv.DictReader(f, delimiter=',')
-            for row in reader:
-                self.data.append(row) 
+        self.data = pandas.read_csv(self.path, index_col='path')
         logging.debug("Rows: read: {}".format(len(self.data)))
         return self.data
 
     def writeFile(self, data, fieldnames):
         """ Writes wallpapers to a csv file.
         """
-        self.data = data
-        with open(self.path, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(self.data)
-            logging.debug("rows written: {}".format(len(self.data)))
+        data.to_csv(self.path,index=False, columns=fieldnames)
 
 class yamlFileIO:
     """Allows the reading and writing of yaml files including opening a
