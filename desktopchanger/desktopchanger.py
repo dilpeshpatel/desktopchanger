@@ -51,40 +51,37 @@ class DesktopChanger:
     def update_sun(self):
         """Retrieve sun information from file or update the information if the 
         day (TODO: future location) information has changed.
+
+        sets parameter is_night_time to True or False depending on the time of 
+        day.
         """
         dates_yaml = yamlFileIO("data", "dates.yaml")
         dates_yaml.readYaml()
         # Read file for date information
         if len(dates_yaml.data) is not 0:
-            self.date = iso8601.parse_date(dates_yaml.data['date'])
-            if self.date == datetime.date.today():
+            date = iso8601.parse_date(dates_yaml.data['date'])
+            if date == datetime.date.today():
                 # Parse from file if date hasn't changed
-                self.sunrise = iso8601.parse_date(dates_yaml.data['sunrise'])
-                self.sunset = iso8601.parse_date(dates_yaml.data['sunset'])
-                self.timezone = pytz.timezone(dates_yaml.data['timezone'])
+                sunrise = iso8601.parse_date(dates_yaml.data['sunrise'])
+                sunset = iso8601.parse_date(dates_yaml.data['sunset'])
+                timezone = pytz.timezone(dates_yaml.data['timezone'])
             #TODO: Can add location check here
             else:
                 # Update date information
                 se = SunEquation(self.latitude,self.longitude)
                 se.calculate()
+                date = datetime.date.today()
+                sunrise = se.rise
+                sunset = se.set
+                timezone = se.timezone
                 output = se.format_yaml()
-                self.date = output["date"]
-                self.sunrise = output["sunrise"]
-                self.sunset = output["sunset"]
-                self.timezone = output["timezone"]
                 dates_yaml.writeYaml(output)
-        
-    def updater(self):
-        """
-            This function takes the information parsed from the 
-            command-line and yaml file and determines what actions to take.
-        """
-        self.update_sun()
-        # find image when not supplied by the commandline 
-        if self.wallpaper_file is None:
-            wallpapers = self.load_csv()
-            self.select_wallpaper(wallpapers)
-        self.set_wallpaper()
+        current_time = datetime.datetime.now(timezone)
+        if  current_time > sunrise and current_time < sunset:
+            self.is_night_time = False
+        else:
+            self.is_night_time = True
+
 
     def load_csv(self):
         """

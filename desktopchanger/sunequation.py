@@ -6,6 +6,7 @@ Wikipedia.
 import os
 import math
 import logging
+# from datetime import datetime, timezone
 import datetime
 import pytz
 import time
@@ -154,6 +155,7 @@ class SunEquation:
         self.set = set_temp + today
         self.rise = self.rise.astimezone(tz)
         self.set = self.set.astimezone(tz)
+        self.timezone = tz
         logging.debug("Sunrise: " + self.rise.strftime("%d/%m/%y %H:%M %p  %Z"))
         logging.debug("Sunrise: " + self.set.strftime("%d/%m/%y %H:%M %p  %Z"))
         return
