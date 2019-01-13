@@ -189,6 +189,8 @@ class WallpaperChanger:
         the current image. Otherwise it does nothing.
         """
         try:
+            logging.debug("Old wallpaper is: {}".format(str(self.old_wallpaper)))
+            logging.debug("New wallpaper is: {}".format(str(self.wallpaper)))
             if self.old_wallpaper != self.wallpaper:
                 cmd = (WallpaperChanger.cmd_wallpaper_set 
                     + repr(str(self.wallpaper)))
