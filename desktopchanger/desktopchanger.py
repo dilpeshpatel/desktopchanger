@@ -69,7 +69,7 @@ class DesktopChanger:
         """
         dates_yaml = yamlFileIO("data", "dates.yaml")
         dates_yaml.readYaml()
-        # Read file for date information
+        sunrise = sunset = timezone = None
         if len(dates_yaml.data) is not 0:
             date = iso8601.parse_date(dates_yaml.data['date'])
             if date == datetime.date.today():
@@ -77,17 +77,17 @@ class DesktopChanger:
                 sunrise = iso8601.parse_date(dates_yaml.data['sunrise'])
                 sunset = iso8601.parse_date(dates_yaml.data['sunset'])
                 timezone = pytz.timezone(dates_yaml.data['timezone'])
-            #TODO: Can add location check here
-            else:
-                # Update date information
-                se = SunEquation(self.latitude,self.longitude)
-                se.calculate()
-                date = datetime.date.today()
-                sunrise = se.rise
-                sunset = se.set
-                timezone = se.timezone
-                output = se.format_yaml()
-                dates_yaml.writeYaml(output)
+                 #TODO: Can add location check here
+        if None in (sunrise, sunset, timezone):
+            # Otherwise create new times
+            se = SunEquation(self.latitude,self.longitude)
+            se.calculate()
+            date = datetime.date.today()
+            sunrise = se.rise
+            sunset = se.set
+            timezone = se.timezone
+            output = se.format_yaml()
+            dates_yaml.writeYaml(output)
         current_time = datetime.datetime.now(timezone)
         if  current_time > sunrise and current_time < sunset:
             self.is_night_time = False
