@@ -7,6 +7,6 @@ set -x
 PID=$(echo $(ps -C xfce4-session -o pid=))                                      
 export $(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ)
 export DISPLAY=:0.0
-cd ${HOME}${PROJECT_FOLDER}
-python updatedesktop.py >> ${HOME}${PROJECT_FOLDER}/logs/bash.log
+cd ${HOME}/${PROJECT_FOLDER}
+python updatedesktop.py >> ${HOME}/${PROJECT_FOLDER}/logs/bash.log
 echo "updatedesktop.py Script complete"
