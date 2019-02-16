@@ -1,5 +1,5 @@
 """
-    The ImageAnalysis class is used to arbitrary information about an 
+    The ImageAnalysis class is used to arbitrary information about an
     image.
     Including:
         * hues
@@ -9,17 +9,9 @@
 import logging
 import numpy as np
 import cv2
-from matplotlib import pyplot as plt
 
 ##### Functions
 #####
-def print_image(img):
-    plt.figure(figsize = (15, 15))
-    rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) 
-    plt.imshow(rgb_img)
-    plt.show()
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 ##### Classes
 #####
@@ -31,27 +23,28 @@ class ImageAnalysis:
     """
 
     def __init__(self, path):
-        """ 
+        """
             Reads in the image path and set up an image.
         """
-        logging.debug("Image Analysis: Analyse path: {}".format(path))
-        self.im = Image(path)
+        logging.debug("Image Analysis: Analyse path: %s", path)
+        self.image = Image(path)
 
     def analyse_hsv(self):
         """
             Convert the RGB image to HSV and return the red, green, blue/
             colours and dark/light balance of the image.
         """
-        self.im.convert_hsv()
-        blue, green, red = self.im.primary_hues()
-        light, dark = self.im.value_gradient()
+        self.image.convert_hsv()
+        blue, green, red = self.image.primary_hues()
+        light, dark = self.image.value_gradient()
         logging.debug("HSV values: \n red: {0:.5f}, \
-            blue: {1:.5f}, green: {2:.5f}  \ \n light: {3:.5f}, dark: {4:.5f} \
+            blue: {1:.5f}, green: {2:.5f}  \
+            \n light: {3:.5f}, dark: {4:.5f} \
             ".format(blue, green, red, light, dark))
         return blue, green, red, light, dark
 
 class Image:
-    """ 
+    """
         Represents a single image.
     """
     def __init__(self, path):
@@ -62,7 +55,7 @@ class Image:
             self.img = cv2.imread(path)
             self.hsv = []
             if self.img is None:
-                raise(FileNotFoundError)
+                raise FileNotFoundError
         except FileNotFoundError:
             print("Could not load image. \n")
             raise
@@ -72,7 +65,7 @@ class Image:
             Converts the rgb self.img into the HSV scheme
         """
         self.hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
-            
+
     def primary_hues(self):
         """
             Returns the fraction of primary colours represented in the image.
@@ -97,7 +90,7 @@ class Image:
         lower_red_high = np.array([164, 80, 80])
         upper_red_high = np.array([179, 255, 255])
         red_hsv_low = cv2.inRange(self.hsv, lower_red_low, upper_red_low)
-        red_hsv_high = cv2.inRange(self.hsv, lower_red_high, upper_red_high)        
+        red_hsv_high = cv2.inRange(self.hsv, lower_red_high, upper_red_high)
         red_hsv = cv2.bitwise_or(red_hsv_low, red_hsv_high)
 
         blue = cv2.countNonZero(blue_hsv)
