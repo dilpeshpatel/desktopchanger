@@ -1,7 +1,8 @@
-"""The DesktopChanger class is the expected method of interacting with
-the functionality provided by this module. Methods that should be
-called by the calling class object:
-* updater
+"""
+    The DesktopChanger class is the high level interface which enables the
+    desktop background and panels (future) to be adjusted depending on the
+    time of day. The main public methods is the updater method.
+    The WallpaperChanger class sets a new wallpaper.
 
 TODO: Fill out info of the methods to call to perform specific tasks.
     These methods take into account the config.yaml and command-line
@@ -21,7 +22,8 @@ from desktopchanger.sunequation import SunEquation
 ##### Functions
 #####
 def randomiser(count):
-    """ Returns a random number from 0 to count.
+    """
+        Returns a random number from 0 to count.
     """
     return random.randint(0, count-1)
 
@@ -29,11 +31,15 @@ def randomiser(count):
 ##### Classes
 #####
 class DesktopChanger:
-    """High level control class.
+    """
+        High level control class. Gathering the current date and time
+        along sunrise and sunset time to determing the type of image to be
+        returned.
     """
     def __init__(self, args):
-        """ Takes in the command line options and reads the contents
-        of the yaml configuration .
+        """
+            Takes in the command line options and reads the contents
+            of the yaml configuration.
         """
         if args.image is not None:
             self.wallpaper_file = Path(str(args.image))
@@ -53,18 +59,18 @@ class DesktopChanger:
             * set a randomised wallpaper depending on time of day
         """
         self.update_sun()
-        # find image when not supplied by the commandline
         if self.wallpaper_file is None:
             wallpapers = self.load_csv()
             self.select_wallpaper(wallpapers)
         self.set_wallpaper()
 
     def update_sun(self):
-        """Retrieve sun information from file or update the information if the
-        day (TODO: future location) information has changed.
+        """
+            Retrieve sun information from file or update the information if the
+            day (TODO: future location) information has changed.
 
-        sets parameter is_night_time to True or False depending on the time of
-        day.
+            sets parameter is_night_time to True or False depending on the time of
+            day.
         """
         dates_yaml = YamlFileIO("data", "dates.yaml")
         dates_yaml.read_yaml()
@@ -107,7 +113,6 @@ class DesktopChanger:
             Selects the wallpaper to be set as desktop background.
         """
         # Search criterion reduces image list
-
         filtered_paths = self.slice_wallpapers(all_images, self.is_night_time)
         chosen_image = randomiser(len(filtered_paths))
         self.wallpaper_file = Path(str(filtered_paths[chosen_image]))
@@ -162,9 +167,10 @@ class WallpaperChanger:
         --property /backdrop/screen0/monitor0/workspace0/last-image --set "
 
     def __init__(self, wallpaper_file):
-        """Takes the new wallpaper_file selected. Then the current
-        wallpaper is read from xfconf-query.
-        * wallpaper_file should be a PosixPath object
+        """
+            Takes the new wallpaper_file selected. Then the current
+            wallpaper is read from xfconf-query.
+            * wallpaper_file should be a PosixPath object
         """
         try:
             self.wallpaper = wallpaper_file
@@ -177,8 +183,9 @@ class WallpaperChanger:
 
     @staticmethod
     def current_wallpaper():
-        """ read current wallpaper being applied from xfconf-query.
-        Returns a Path object stripped of bash wrapping.
+        """
+            Read current wallpaper being applied from xfconf-query.
+            Returns a Path object stripped of bash wrapping.
         """
         try:
             output = subprocess.check_output(
@@ -189,8 +196,9 @@ class WallpaperChanger:
         return Path(output.strip().decode())
 
     def apply_new_wallpaper(self):
-        """Updates the wallpaper if the current new image is different to
-        the current image. Otherwise it does nothing.
+        """
+            Updates the wallpaper if the current new image is different to
+            the current image. Otherwise it does nothing.
         """
         try:
             logging.debug("Old wallpaper is: %s", str(self.old_wallpaper))

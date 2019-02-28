@@ -1,9 +1,8 @@
 """
-    The classes contained here are designed to traverse a given folder
-    and find images files.
+    WallpaperSearch traverses a given folder and find images files.
     This will be turned into a database set at a later date.
     For now the behaviour is to analyse each image in a single directory
-    and extract the full path and some information about the image.
+    and extract the full path and information about the image.
 
     Improvements
     *fieldnames variable should only exist in one place
@@ -22,8 +21,8 @@ IMAGE_FORMATS = {".jpg", ".jpeg", ".png"}
 #####
 class WallpaperSearch:
     """
-        This class is used to take a folder path and retreive all image
-        files held within.
+        This class is used to take a directory path and retreive all image
+        files held within recursively.
     """
     def __init__(self, args):
         try:
@@ -46,8 +45,8 @@ class WallpaperSearch:
 
     def search_folder(self):
         """
-            Main method to call from object to process nested paths to
-            build a list of images which are then saved to file.
+            Main method which recursively processes the path and builds
+            a list of images which are saved to a file.
         """
         image_files = self.process_path()
         self.process_images(image_files)
@@ -112,7 +111,7 @@ class WallpaperSearch:
 
     def dict_formatter(self, path, blue, green, red, light, dark):
         """
-            Dictionary object to be constructed to save data to file.
+            Dictionary object associating fields to the data elements.
             Note: This way seems terribly inefficient.
         """
         fieldnames = ['path', 'blue', 'green', 'red', 'light', 'dark']

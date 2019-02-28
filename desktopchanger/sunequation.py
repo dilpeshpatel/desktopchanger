@@ -1,7 +1,6 @@
 """
-    The SunEquation class is used approximately calculate the
-    sunset and sunrise times using the Sunrise Equation found on
-    Wikipedia.
+    The SunEquation class is used approximately calculate the sunset and
+    sunrise times using the Sunrise Equation found on Wikipedia.
 """
 
 import math
@@ -21,9 +20,9 @@ class SunEquation:
         minutes. #FUTURE: test the accuracy of this theory.
     """
 
-    def __init__(self, latitude, longitude_west):
+    def __init__(self, latitude, longitude):
         self.date_today = datetime.date.today()
-        self.longitude_west = longitude_west
+        self.longitude_west = longitude
         self.latitude = latitude
         self.jdn = None
         self.rise = None
@@ -61,7 +60,7 @@ class SunEquation:
             self.date_today.month,
             self.date_today.day)
         n = jdn - 2451545.0 + 0.0008
-        logging.debug("CUrrent julain day %s", str(n))
+        logging.debug("Current julain day %s", str(n))
         return n
 
     def julian_date(self, year, month, day):
@@ -189,7 +188,7 @@ class SunEquation:
         hour = math.floor(julian*24)
         minute = math.floor((julian*24-hour)*60)
         delta = datetime.timedelta(hours=hour, minutes=minute)
-        logging.debug("Time: %s", str(delta))
+        logging.debug("Time Delta: %s", str(delta))
         return delta
 
     def format_yaml(self):

@@ -1,5 +1,5 @@
 """
-    The ImageAnalysis class is used to arbitrary information about an
+    The ImageAnalysis class is used to gather information about an
     image.
     Including:
         * hues

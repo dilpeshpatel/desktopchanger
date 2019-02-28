@@ -5,25 +5,32 @@ Ultimate aim of this project is to be able to adjust the wallpaper (and in futur
 ## Prerequistes
 
 * XFCE system
+* separate virtual environment created for this project.
+* Cron installed
 
-### Configuration
 
-A config.yaml file is needed in the same directory and the latitude and longitude values for the current position must be supplied. 
+## Configuration
+
+### Yaml 
+1. Create a directory called data and place an empty file called dates.yaml within
+1. Open the `config.yaml` file
+1. Set the wallpapersFolder variable to the directory containing the wallpaper images.
+1. Set the longitude and latitude variables to the current city. 
 !! North and West are positive values whilst East and South are negative values.
 
-## Cron
+### Cron 
 Cron is used to automate running the update wallpaper script at a set time interval. 
 
 > Because cron is run as the root user the user environment variables containing the display session are not available. To get around this issue this project has introduced a bash script which sets the necessary environmental variables.
 
-### Prerequisites
-* virtual environment for this project
-* cron
+####Bash script
+Before it can be used the bash script must also be configured. 
 
-###Bash script
-The bash script `/scripts/desktopchanger.sh` needs to have paths set specifically the `PROJECT_FOLDER` environmental variable and the `source` virtual environment lines. The former line points to the project folder path and the latter is the path to virtual environment created for this project.
+1. Open the '/scripts/desktopchanger.sh' file
+1. Complete the path on the fifth line starting "source" which points from the home directory to the virtual environment activation script. 
+1. Set the 'PROJECT_FOLDER' path to point from the home directory to the project folder directory. (Include a trailing '/')
 
-###Cron Task
+####Cron Task
 Append the line to crontab (e.g. using `crontab -e`):
 ```
 * * * * * "./<path to project from user home directory>/desktopchanger.sh" 

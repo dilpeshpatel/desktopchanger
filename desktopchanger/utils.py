@@ -1,9 +1,6 @@
 """ This file contains shared classes and functions.
-    * imageStruct is just there for reference purposes and to allow the
-    fieldname variable to be set when saving to csv.
-    * parse_yaml returns the contents of the config.yaml file as a dict
+    * yamlFileIO returns the contents of the config.yaml file as a dict
     * CSVFileIO is used to read from or write to a .csv file.
-    config.yaml.
 """
 import logging
 import os
@@ -53,6 +50,7 @@ class YamlFileIO:
         it returns without doing anything.
         """
         if not self.path.is_file():
+            logging.debug("File not found %s. No action taken", self.path)
             return
         try:
             with self.path.open('r') as f:
@@ -67,9 +65,9 @@ class YamlFileIO:
     def write_yaml(self, output):
         """
             Write dictionary object to yaml file.
-        """
+        # """
         try:
-            with self.path.open('w') as f:
+            with self.path.open('w+') as f:
                 yaml.dump(output, f, default_flow_style=False)
         except IOError as e_info:
             print(e_info)
