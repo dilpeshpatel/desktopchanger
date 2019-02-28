@@ -47,10 +47,18 @@ class DesktopChanger:
             self.wallpaper_file = None
         yaml_config = YamlFileIO("", "config.yaml")
         yaml_config.read_yaml()
-        self.csvfile = yaml_config.data['csvFile']
-        self.latitude = yaml_config.data['latitude']
-        self.longitude = yaml_config.data['longitude']
-        self.is_night_time = False
+        try:
+            self.csvfile = yaml_config.data['csvFile']
+            if yaml_config.data['latitude'] is None \
+                or yaml_config.data['longitude'] is None:
+                raise TypeError
+            self.latitude = yaml_config.data['latitude']
+            self.longitude = yaml_config.data['longitude']
+            self.is_night_time = False
+        except TypeError as e_info:
+            print("Latitude and/or longitude values must be filled in config.yaml. " + str(e_info))
+            raise
+
 
     def updater(self):
         """

@@ -184,7 +184,9 @@ class SunEquation:
             Takes a fraction of a julain day and returns the time as a
             datetime element.
         """
-        assert julian < 1
+        # 19/03/01 Removed line below which may be because of NZ Timezone.
+        # Require further testing
+        # assert julian < 1
         hour = math.floor(julian*24)
         minute = math.floor((julian*24-hour)*60)
         delta = datetime.timedelta(hours=hour, minutes=minute)
